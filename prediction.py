@@ -243,8 +243,6 @@ y = df['Quality of patient care star rating']
 
 le = LabelEncoder()
 y_encoded = le.fit_transform(y)
-
-
 X_train, X_test, y_train, y_test = train_test_split(
     X, y_encoded, test_size=0.25, random_state=42, stratify=y_encoded)
 
@@ -260,3 +258,43 @@ feature_importances = rf_classifier.feature_importances_
 print("Feature Importances:")
 for feature, importance in zip(X.columns, feature_importances):
     print(f"{feature}: {importance}")
+
+
+
+print()
+print("--------------------------------------ADABOOST (Regression)------------------------------------------")
+
+from sklearn.ensemble import AdaBoostRegressor
+
+X = df.iloc[:, 1:6]
+y = df['Quality of patient care star rating']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+adaboost_regressor = AdaBoostRegressor(n_estimators=50, random_state=42)
+adaboost_regressor.fit(X_train_scaled, y_train)
+
+y_pred_adaboost_regression = adaboost_regressor.predict(X_test_scaled)
+
+mae_adaboost_regression = mean_absolute_error(y_test, y_pred_adaboost_regression)
+print(f'Test Mean Absolute Error (AdaBoost Regression): {mae_adaboost_regression}')
+accuracy_adaboost_regression = 1 - mae_adaboost_regression
+print(f'Accuracy (AdaBoost Regression): {accuracy_adaboost_regression}')
+
+print("---------------------ACCURACY SUMMARY--------------------------------")
+
+models = ['ID3', 'Neural Network (Regression)', 'Neural Network (Classification)', 'Naive Bayes (Gaussian)',
+          'Naive Bayes (Multinomial)', 'Linear Regression', 'AdaBoost Regression', 'Random Forest']
+accuracies = [accuracy_id3, accuracy_RN_1, accuracy_RN_2, accuracy_Bayes_Gaussian, accuracy_Bayes_Multinomial,
+              accuracy_linear_regression, accuracy_adaboost_regression, accuracy_rf]
+
+plt.bar(models, accuracies, color=['pink', 'blue', 'orange', 'green', 'red', 'purple', 'cyan', 'magenta', 'brown'])
+plt.ylim(0, 1.2)
+plt.title('Test Accuracies Comparison')
+plt.ylabel('Accuracy')
+plt.xticks(rotation=45, ha='right')
+plt.show()
