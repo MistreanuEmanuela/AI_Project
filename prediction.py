@@ -17,6 +17,8 @@ from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 
 len_category = []
+
+
 def retain_top_n_per_category(df, column_name, n=200):
     result_df = pd.DataFrame()
     values = set(df[column_name])
@@ -34,14 +36,14 @@ def retain_top_n_per_category(df, column_name, n=200):
 
 df = pd.read_csv('preprocessing_data.csv')
 
-values = set(df['Quality of patient care star rating'])
+values = set(df['HHCAHPS Survey Summary Star Rating'])
 for column_value in values:
-    category_df = df[df['Quality of patient care star rating'] == float(column_value)]
-    len_category.append(len(category_df['Quality of patient care star rating']))
+    category_df = df[df['HHCAHPS Survey Summary Star Rating'] == float(column_value)]
+    len_category.append(len(category_df['HHCAHPS Survey Summary Star Rating']))
 
-df = retain_top_n_per_category(df, 'Quality of patient care star rating', n=round(np.mean(len_category)))
-X = df.iloc[:, 1:6]
-y = df['Quality of patient care star rating']
+df = retain_top_n_per_category(df, 'HHCAHPS Survey Summary Star Rating', n=round(np.mean(len_category)))
+X = df.iloc[:, 1:5]
+y = df['HHCAHPS Survey Summary Star Rating']
 scaler = StandardScaler()
 X = scaler.fit_transform(X)
 le = LabelEncoder()
@@ -64,7 +66,7 @@ print("RN -------------y is a continue value from 1 to 5 ---------------------")
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42, stratify=y_encoded)
 model = Sequential()
-model.add(Dense(units=50, activation='relu', input_dim=5))
+model.add(Dense(units=50, activation='relu', input_dim=4))
 model.add(Dense(units=1, activation='linear'))
 
 model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae'])
@@ -86,10 +88,10 @@ print()
 print("RN -------------9 CLASSES WITH FIXED VALUES---------------------")
 
 y = pd.get_dummies(y)
-num_classes = 9
+num_classes = 5
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42, stratify=y_encoded)
 model = Sequential()
-model.add(Dense(units=50, activation='relu', input_dim=5))
+model.add(Dense(units=50, activation='relu', input_dim=4))
 model.add(Dense(units=num_classes, activation='softmax'))
 
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
@@ -134,10 +136,10 @@ print("--------------------------------------BAYES NAIVE -----------------------
 
 
 label_encoder = LabelEncoder()
-y = df['Quality of patient care star rating']
+y = df['HHCAHPS Survey Summary Star Rating']
 y = label_encoder.fit_transform(y)
 
-X_train, X_test, y_train, y_test = train_test_split(df.iloc[:, 1:6], y, test_size=0.25, random_state=42, stratify=y_encoded)
+X_train, X_test, y_train, y_test = train_test_split(df.iloc[:, 1:5], y, test_size=0.25, random_state=42, stratify=y_encoded)
 
 scaler = StandardScaler()
 
@@ -158,30 +160,11 @@ accuracy_Bayes_Gaussian = accuracy
 print(f'Test Accuracy: {accuracy}')
 
 print()
-print("--------------------------------------BAYES NAIVE MULTINOMIAL------------------------------------------")
-
-X = df.iloc[:, 1:6]
-y = df['Quality of patient care star rating']
-
-label_encoder = LabelEncoder()
-y = label_encoder.fit_transform(y)
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42, stratify=y_encoded)
-
-model = MultinomialNB()
-model.fit(X_train, y_train)
-
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
-accuracy_Bayes_Multinomial = accuracy
-print(f'Test Accuracy: {accuracy}')
-
-print()
 print("--------------------------------------LINEAR REGRESSION------------------------------------------")
 
 
-X = df.iloc[:, 1:6]
-y = df['Quality of patient care star rating']
+X = df.iloc[:, 1:5]
+y = df['HHCAHPS Survey Summary Star Rating']
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42, stratify=y_encoded)
 
@@ -216,17 +199,14 @@ print("Naive Bayes (Gaussian):")
 print(f'Test Accuracy: {accuracy_Bayes_Gaussian}')
 print()
 
-print("Naive Bayes (Multinomial):")
-print(f'Test Accuracy: {accuracy_Bayes_Multinomial}')
-print()
 
 print("Linear Regression:")
 print(f'Test accuracy: {accuracy_linear_regression}')
 print()
 
 models = ['ID3', 'Neural Network (Regression)', 'Neural Network (Classification)', 'Naive Bayes (Gaussian)',
-          'Naive Bayes (Multinomial)', 'Linear Regression']
-accuracies = [accuracy_id3, accuracy_RN_1, accuracy_RN_2, accuracy_Bayes_Gaussian, accuracy_Bayes_Multinomial,
+          'Linear Regression']
+accuracies = [accuracy_id3, accuracy_RN_1, accuracy_RN_2, accuracy_Bayes_Gaussian,
               accuracy_linear_regression]
 
 plt.bar(models, accuracies, color=['pink', 'blue', 'orange', 'green', 'red', 'purple'])
@@ -238,8 +218,8 @@ plt.show()
 
 print("---------------------RANDOM FOREST--------------------------------")
 
-X = df.iloc[:, 1:6]
-y = df['Quality of patient care star rating']
+X = df.iloc[:, 1:5]
+y = df['HHCAHPS Survey Summary Star Rating']
 
 le = LabelEncoder()
 y_encoded = le.fit_transform(y)
@@ -266,8 +246,8 @@ print("--------------------------------------ADABOOST (Regression)--------------
 
 from sklearn.ensemble import AdaBoostRegressor
 
-X = df.iloc[:, 1:6]
-y = df['Quality of patient care star rating']
+X = df.iloc[:, 1:5]
+y = df['HHCAHPS Survey Summary Star Rating']
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
 
@@ -288,11 +268,11 @@ print(f'Accuracy (AdaBoost Regression): {accuracy_adaboost_regression}')
 print("---------------------ACCURACY SUMMARY--------------------------------")
 
 models = ['ID3', 'Neural Network (Regression)', 'Neural Network (Classification)', 'Naive Bayes (Gaussian)',
-          'Naive Bayes (Multinomial)', 'Linear Regression', 'AdaBoost Regression', 'Random Forest']
-accuracies = [accuracy_id3, accuracy_RN_1, accuracy_RN_2, accuracy_Bayes_Gaussian, accuracy_Bayes_Multinomial,
+          'Linear Regression', 'AdaBoost Regression', 'Random Forest']
+accuracies = [accuracy_id3, accuracy_RN_1, accuracy_RN_2, accuracy_Bayes_Gaussian,
               accuracy_linear_regression, accuracy_adaboost_regression, accuracy_rf]
 
-plt.bar(models, accuracies, color=['pink', 'blue', 'orange', 'green', 'red', 'purple', 'cyan', 'magenta', 'brown'])
+plt.bar(models, accuracies, color=['pink', 'blue', 'orange', 'green', 'red', 'purple', 'cyan', 'magenta'])
 plt.ylim(0, 1.2)
 plt.title('Test Accuracies Comparison')
 plt.ylabel('Accuracy')

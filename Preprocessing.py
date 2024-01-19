@@ -87,7 +87,7 @@ def eliminate_outliers(data):
     index_li = []
     for column in data.columns:
         if find_type(data[column]) == "float":
-            my_new_data = [float(i.replace(',', '')) for i in data[column] if str(i) != '-']
+            my_new_data = [float(str(i).replace(',', '')) for i in data[column] if str(i) != '-']
             q1 = np.percentile(my_new_data, 25)
             q3 = np.percentile(my_new_data, 75)
             iqr = q3 - q1
@@ -97,7 +97,7 @@ def eliminate_outliers(data):
                 if i == "-":
                     pass
                 else:
-                    x = float(i.replace(',', ''))
+                    x = float(str(i).replace(',', ''))
                     if (x < lower_limit) | (x > upper_limit):
                         index_li.append(index)
     index_set = set(index_li)
@@ -110,7 +110,7 @@ def eliminate_outliers(data):
 def nan_complete(data):
     for column in data.columns:
         if find_type(data[column]) == "float":
-            new_array = [float(i.replace(',', '')) for i in data[column] if str(i) != '-']
+            new_array = [float(str(i).replace(',', '')) for i in data[column] if str(i) != '-']
             mean_column = round(np.mean(new_array), 2)
             data[column] = data[column].apply(lambda x: mean_column if str(x) == "-" else x)
     return data
@@ -233,8 +233,14 @@ def correlation_elimination(data, y):
     return data
 
 
+def not_available(df):
+    df.replace({'Not Available': '-', np.nan: '-'}, inplace=True)
+    return df
+
+
 def preprocessing():
-    df = pd.read_csv('data.csv')
+    df = pd.read_csv('HHCAHPS_Provider_Jan2024.csv')
+    df = not_available(df)
     df = column_elimination(df)
     df = eliminate_row_space(df)
     df = eliminate_outliers(df)
@@ -243,7 +249,7 @@ def preprocessing():
     data_view(df)
     df = transform_str_to_numerical_rep(df)
     df = convert_to_float(df)
-    y = df['Quality of patient care star rating'].values.astype(float)
+    y = df['HHCAHPS Survey Summary Star Rating'].values.astype(float)
     df = correlation_elimination(df, y)
     csv_update(df)
 
