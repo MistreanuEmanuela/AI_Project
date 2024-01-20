@@ -48,12 +48,13 @@ def retain_random_n_per_category(data, column_name, n=50):
 def data_for_classification(filename, target_column):
     len_category = []
     data = pd.read_csv(filename)
+    data = data[~data[target_column].isin([3.61, 3.71])]
     data_view_per_class(data, target_column)
     values = set(data[target_column])
     for column_value in values:
         category_df = data[data[target_column] == float(column_value)]
         len_category.append(len(category_df[target_column]))
-    data = retain_random_n_per_category(data, target_column, n= 200)
+    data = retain_random_n_per_category(data, target_column, n = 200)
     return data
 
 
@@ -101,6 +102,7 @@ def train_neuronal_network_continuous(x, y, input_dim):
     model.add(Dense(units=1, activation='linear'))
     model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae'])
     history = model.fit(x_train, y_train, epochs=200, batch_size=100, validation_data=(x_test, y_test))
+
     loss, mae = model.evaluate(x_test, y_test)
     accuracy = 1 - mae
     return model, history, accuracy, sc
@@ -117,7 +119,6 @@ def create_model(units=50, activation='relu', input_dim=4, alpha=0.01, num_class
 
 def train_neuronal_network_multi_class(x, y, alpha_values=[0.01, 0.1, 1.0]):
     x_inp, y_enc, sc = preprocess_data_rn(x, y)
-    print(x_inp)
     y = pd.get_dummies(y)
     num_classes = len(set(y))
     x_train, x_test, y_train, y_test = train_test_split(x_inp, y, test_size=0.25, random_state=42, stratify=y)
@@ -191,8 +192,7 @@ def ada_boost(x, y):
     return adaboost_regressor, accuracy
 
 
-def predict_instance_id3(model, instance):
-    val = [1.5, 2, 2.5, 3, 3.61, 4, 4.5, 5]
+def predict_instance_id3(model, instance, val):
     new_instance_prediction = model.predict(instance)
     return val[new_instance_prediction[0]]
 
@@ -201,7 +201,7 @@ def predict_instance_RN_continuous(model, instance, scaler):
     instance = scaler.fit_transform(instance)
     predictions = model.predict([instance])
     print(predictions)
-    return predictions[0][0]
+    return custom_round(predictions[0][0], 0.5)
 
 
 def predict_instance_RN_multiclass(label_encoder, model, instance, scaler):
@@ -221,18 +221,17 @@ def predict_instance_bayes(label_encoder, model, instance):
 
 def predict_instance_linear_regression(model, instance):
     prediction = model.predict(instance)
-    return prediction[0]
+    return custom_round(prediction[0], 0.5)
 
 
-def predict_instance_random_forest(model, instance):
-    val = [1.5, 2, 2.5, 3, 3.61, 4, 4.5, 5]
+def predict_instance_random_forest(model, instance, val):
     prediction = model.predict(instance)
     return val[prediction[0]]
 
 
 def predict_instance_ada_boost(model, instance):
     prediction = model.predict(instance)
-    return prediction[0]
+    return custom_round(prediction[0], 0.5)
 
 
 def plot_rn_mae(history):
@@ -282,7 +281,12 @@ def plot_test_accuracies_comparison(accuracy_id3, accuracy_RN_1, accuracy_RN_2, 
               'Linear Regression', 'AdaBoost', 'Random Forest']
     accuracies = [accuracy_id3, accuracy_RN_1, accuracy_RN_2, accuracy_bayes,
                   accuracy_linear_regression, accuracy_adaboost_regression, accuracy_rf]
-    plt.bar(models, accuracies, color=['pink', 'blue', 'orange', 'green', 'red', 'purple', 'cyan', 'magenta'])
+
+    colors = ['pink', 'blue', 'orange', 'green', 'red', 'purple', 'cyan']
+    plt.bar(models, accuracies, color=colors)
+    for i, acc in enumerate(accuracies):
+        plt.text(i, acc + 0.02, f'{acc:.2f}', ha='center', va='bottom', fontsize=8)
+
     plt.ylim(0, 1.2)
     plt.title('Test Accuracies Comparison')
     plt.ylabel('Accuracy')
@@ -293,6 +297,7 @@ def plot_test_accuracies_comparison(accuracy_id3, accuracy_RN_1, accuracy_RN_2, 
 def first_data_set():
     print("-----------------FIRST DATASET------------------")
     X, Y = load_data("result1.csv", 'Quality of patient care star rating')
+    val = [1.5, 2, 2.5, 3, 4, 4.5, 5]
     label_encoder = LabelEncoder()
     label_encoder.fit_transform(Y)
 
@@ -323,12 +328,12 @@ def first_data_set():
     })
 
     print("-----------------Predicting instance------------------")
-    id3_prediction = predict_instance_id3(dt_model, new_instance)
+    id3_prediction = predict_instance_id3(dt_model, new_instance, val)
     RN_continuous_prediction = predict_instance_RN_continuous(RN_model1, new_instance, sc_rn1)
     RN_multiclass_prediction = predict_instance_RN_multiclass(label_encoder, RN_model2, new_instance, sc_rn2)
     bayes_prediction = predict_instance_bayes(label_encoder_bayes, bayes_model, new_instance)
     linear_regression_prediction = predict_instance_linear_regression(linear_regression_model, new_instance)
-    random_forest_prediction = predict_instance_random_forest(rf_model, new_instance)
+    random_forest_prediction = predict_instance_random_forest(rf_model, new_instance, val)
     ada_boost_prediction = predict_instance_ada_boost(ada_boost_model, new_instance)
 
     print("predicting instance with id3: ", id3_prediction)
@@ -356,7 +361,7 @@ def first_data_set():
     #plots
     plot_rn_mae(history_rn1)
     plot_rn_accuracy_continuous(history_rn2)
-    plot_rn_ROC(RN_model2, X_test_RN2, 9, y_test_RN2)
+    plot_rn_ROC(RN_model2, X_test_RN2, 8, y_test_RN2)
     plot_test_accuracies_comparison(accuracy_id3, accuracy_RN_1, accuracy_RN_2, accuracy_bayes,
                                     accuracy_linear_regression, accuracy_ada_boost, accuracy_rf)
 
@@ -364,6 +369,7 @@ def first_data_set():
 def second_data_set():
     print("-----------------SECOND DATASET------------------")
     X, Y = load_data("result2.csv", 'HHCAHPS Survey Summary Star Rating')
+    val = [2, 3, 4, 5]
     label_encoder = LabelEncoder()
     label_encoder.fit_transform(Y)
 
@@ -393,12 +399,12 @@ def second_data_set():
     })
 
     print("-----------------Predicting instance------------------")
-    id3_prediction = predict_instance_id3(dt_model, new_instance)
+    id3_prediction = predict_instance_id3(dt_model, new_instance, val)
     RN_continuous_prediction = predict_instance_RN_continuous(RN_model1, new_instance, sc_rn1)
     RN_multiclass_prediction = predict_instance_RN_multiclass(label_encoder, RN_model2, new_instance, sc_rn2)
     bayes_prediction = predict_instance_bayes(label_encoder_bayes, bayes_model, new_instance)
     linear_regression_prediction = predict_instance_linear_regression(linear_regression_model, new_instance)
-    random_forest_prediction = predict_instance_random_forest(rf_model, new_instance)
+    random_forest_prediction = predict_instance_random_forest(rf_model, new_instance, val)
     ada_boost_prediction = predict_instance_ada_boost(ada_boost_model, new_instance)
 
     print("predicting instance with id3: ", id3_prediction)
@@ -425,7 +431,7 @@ def second_data_set():
 
     plot_rn_mae(history_rn1)
     plot_rn_accuracy_continuous(history_rn2)
-    plot_rn_ROC(RN_model2, X_test_RN2, 5, y_test_RN2)
+    plot_rn_ROC(RN_model2, X_test_RN2, 4, y_test_RN2)
     plot_test_accuracies_comparison(accuracy_id3, accuracy_RN_1, accuracy_RN_2, accuracy_bayes,
                                     accuracy_linear_regression, accuracy_ada_boost, accuracy_rf)
 

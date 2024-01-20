@@ -3,7 +3,7 @@
     "Target": 2.0
   },
   "RN - continous": {
-    "Target": 3.4550728797912598
+    "Target": 3.5
   },
   "RN - multiclass": {
     "Target": 2.0
@@ -12,12 +12,12 @@
     "Target": 2.0
   },
   "Linear Regression": {
-    "Target": 2.055669562697833
+    "Target": 2.0
   },
   "Random Forest": {
     "Target": 2.0
   },
   "AdaBoost": {
-    "Target": 2.171875
+    "Target": 2.0
   }
 }
