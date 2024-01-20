@@ -1,3 +1,5 @@
+import json
+
 from keras.src.regularizers import l2
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
@@ -91,9 +93,8 @@ def train_id3(x, y):
     return model, accuracy
 
 
-def train_neuronal_network_continuous(x, y):
+def train_neuronal_network_continuous(x, y, input_dim):
     x_inc, y_encoded, sc = preprocess_data_rn(x, y)
-    input_dim = 5
     x_train, x_test, y_train, y_test = train_test_split(x_inc, y, test_size=0.25, random_state=42, stratify=y)
     model = Sequential()
     model.add(Dense(units=50, activation='relu', input_dim=input_dim))
@@ -289,14 +290,14 @@ def plot_test_accuracies_comparison(accuracy_id3, accuracy_RN_1, accuracy_RN_2, 
     plt.show()
 
 
-def main():
-    X, Y = load_data("preprocessing_data.csv", 'Quality of patient care star rating')
-    print(X, Y)
+def first_data_set():
+    print("-----------------FIRST DATASET------------------")
+    X, Y = load_data("result1.csv", 'Quality of patient care star rating')
     label_encoder = LabelEncoder()
     label_encoder.fit_transform(Y)
 
     dt_model, accuracy_id3 = train_id3(X, Y)
-    RN_model1, history_rn1, accuracy_RN_1, sc_rn1 = train_neuronal_network_continuous(X, Y)
+    RN_model1, history_rn1, accuracy_RN_1, sc_rn1 = train_neuronal_network_continuous(X, Y, 5)
     RN_model2, history_rn2, accuracy_RN_2, X_train_RN2, X_test_RN2, y_test_RN2, sc_rn2 =\
         train_neuronal_network_multi_class(X, Y)
     bayes_model, accuracy_bayes, label_encoder_bayes = train_bayes(X, Y)
@@ -312,6 +313,7 @@ def main():
     print("Accuracy Linear Regression: ", accuracy_linear_regression)
     print("Accuracy Random Forest: ", accuracy_rf)
     print("Accuracy Ada Boost: ", accuracy_ada_boost)
+
     new_instance = pd.DataFrame({
         "How often patients got better at walking or moving around": [70.1],
         "How often patients got better at getting in and out of bed": [66.5],
@@ -319,27 +321,117 @@ def main():
         "How often patients' breathing improved": [66.8],
         "How often patients got better at taking their drugs correctly by mouth": [62.3]
     })
+
     print("-----------------Predicting instance------------------")
-    print("predicting instance with id3: ", predict_instance_id3(dt_model, new_instance))
-    print("predicting instance with RN - continuous: ", predict_instance_RN_continuous(RN_model1,
-                                                                                       new_instance, sc_rn1))
-    print("predicting instance with RN - multiclass: ", predict_instance_RN_multiclass(label_encoder, RN_model2,
-                                                                                       new_instance,
-                                                                                       sc_rn2))
-    print("predicting instance with Bayes: ", predict_instance_bayes(label_encoder, bayes_model,
-                                                                     new_instance))
-    print("predicting instance with Linear Regression: ", predict_instance_linear_regression(linear_regression_model,
-                                                                            new_instance))
-    print("predicting instance with Random Forest: ", predict_instance_random_forest(rf_model, new_instance
-                                                                                     ))
-    print("predicting instance with Ada Boost: ", predict_instance_ada_boost(ada_boost_model,
-                                                                             new_instance))
+    id3_prediction = predict_instance_id3(dt_model, new_instance)
+    RN_continuous_prediction = predict_instance_RN_continuous(RN_model1, new_instance, sc_rn1)
+    RN_multiclass_prediction = predict_instance_RN_multiclass(label_encoder, RN_model2, new_instance, sc_rn2)
+    bayes_prediction = predict_instance_bayes(label_encoder_bayes, bayes_model, new_instance)
+    linear_regression_prediction = predict_instance_linear_regression(linear_regression_model, new_instance)
+    random_forest_prediction = predict_instance_random_forest(rf_model, new_instance)
+    ada_boost_prediction = predict_instance_ada_boost(ada_boost_model, new_instance)
+
+    print("predicting instance with id3: ", id3_prediction)
+    print("predicting instance with RN - continuous: ", RN_continuous_prediction)
+    print("predicting instance with RN - multiclass: ", RN_multiclass_prediction)
+    print("predicting instance with Bayes: ", bayes_prediction)
+    print("predicting instance with Linear Regression: ", linear_regression_prediction)
+    print("predicting instance with Random Forest: ", random_forest_prediction)
+    print("predicting instance with Ada Boost: ", ada_boost_prediction)
+
+    predictions = {
+        "ID3": {"Target": float(id3_prediction)},
+        "RN - continous": {"Target": float(RN_continuous_prediction)},
+        "RN - multiclass": {"Target": float(RN_multiclass_prediction)},
+        "Bayes": {"Target": float(bayes_prediction)},
+        "Linear Regression": {"Target": float(linear_regression_prediction)},
+        "Random Forest": {"Target": float(random_forest_prediction)},
+        "AdaBoost": {"Target": float(ada_boost_prediction)}
+    }
+
+    predictions_json = json.dumps(predictions, indent=2)
+    with open("predictions1.json", "w") as json_file:
+        json_file.write(predictions_json)
+
+    #plots
+    plot_rn_mae(history_rn1)
+    plot_rn_accuracy_continuous(history_rn2)
+    plot_rn_ROC(RN_model2, X_test_RN2, 9, y_test_RN2)
+    plot_test_accuracies_comparison(accuracy_id3, accuracy_RN_1, accuracy_RN_2, accuracy_bayes,
+                                    accuracy_linear_regression, accuracy_ada_boost, accuracy_rf)
+
+
+def second_data_set():
+    print("-----------------SECOND DATASET------------------")
+    X, Y = load_data("result2.csv", 'HHCAHPS Survey Summary Star Rating')
+    label_encoder = LabelEncoder()
+    label_encoder.fit_transform(Y)
+
+    dt_model, accuracy_id3 = train_id3(X, Y)
+    RN_model1, history_rn1, accuracy_RN_1, sc_rn1 = train_neuronal_network_continuous(X, Y, 4)
+    RN_model2, history_rn2, accuracy_RN_2, X_train_RN2, X_test_RN2, y_test_RN2, sc_rn2 =\
+        train_neuronal_network_multi_class(X, Y)
+    bayes_model, accuracy_bayes, label_encoder_bayes = train_bayes(X, Y)
+    linear_regression_model, accuracy_linear_regression = train_linear_regression(X, Y)
+    rf_model, accuracy_rf = random_forest(X, Y)
+    ada_boost_model, accuracy_ada_boost = ada_boost(X, Y)
+
+    print("-----------------Accuracy on testing------------------")
+    print("Accuracy id3: ", accuracy_id3)
+    print("Accuracy RN with continuous output: ", accuracy_RN_1)
+    print("Accuracy RN multiclass: ", accuracy_RN_2)
+    print("Accuracy Bayes: ", accuracy_bayes)
+    print("Accuracy Linear Regression: ", accuracy_linear_regression)
+    print("Accuracy Random Forest: ", accuracy_rf)
+    print("Accuracy Ada Boost: ", accuracy_ada_boost)
+
+    new_instance = pd.DataFrame({
+        "Star Rating for health team gave care in a professional way": [3.0],
+        "Star Rating for health team communicated well with them": [2.0],
+        "Star Rating team discussed medicines, pain, and home safety": [3.0],
+        "Star Rating for how patients rated overall care from agency": [3.0],
+    })
+
+    print("-----------------Predicting instance------------------")
+    id3_prediction = predict_instance_id3(dt_model, new_instance)
+    RN_continuous_prediction = predict_instance_RN_continuous(RN_model1, new_instance, sc_rn1)
+    RN_multiclass_prediction = predict_instance_RN_multiclass(label_encoder, RN_model2, new_instance, sc_rn2)
+    bayes_prediction = predict_instance_bayes(label_encoder_bayes, bayes_model, new_instance)
+    linear_regression_prediction = predict_instance_linear_regression(linear_regression_model, new_instance)
+    random_forest_prediction = predict_instance_random_forest(rf_model, new_instance)
+    ada_boost_prediction = predict_instance_ada_boost(ada_boost_model, new_instance)
+
+    print("predicting instance with id3: ", id3_prediction)
+    print("predicting instance with RN - continuous: ", RN_continuous_prediction)
+    print("predicting instance with RN - multiclass: ", RN_multiclass_prediction)
+    print("predicting instance with Bayes: ", bayes_prediction)
+    print("predicting instance with Linear Regression: ", linear_regression_prediction)
+    print("predicting instance with Random Forest: ", random_forest_prediction)
+    print("predicting instance with Ada Boost: ", ada_boost_prediction)
+
+    predictions = {
+        "ID3": {"Target": float(id3_prediction)},
+        "RN - continous": {"Target": float(RN_continuous_prediction)},
+        "RN - multiclass": {"Target": float(RN_multiclass_prediction)},
+        "Bayes": {"Target": float(bayes_prediction)},
+        "Linear Regression": {"Target": float(linear_regression_prediction)},
+        "Random Forest": {"Target": float(random_forest_prediction)},
+        "AdaBoost": {"Target": float(ada_boost_prediction)}
+    }
+
+    predictions_json = json.dumps(predictions, indent=2)
+    with open("predictions2.json", "w") as json_file:
+        json_file.write(predictions_json)
 
     plot_rn_mae(history_rn1)
     plot_rn_accuracy_continuous(history_rn2)
     plot_rn_ROC(RN_model2, X_test_RN2, 5, y_test_RN2)
     plot_test_accuracies_comparison(accuracy_id3, accuracy_RN_1, accuracy_RN_2, accuracy_bayes,
                                     accuracy_linear_regression, accuracy_ada_boost, accuracy_rf)
+
+def main():
+    first_data_set()
+    second_data_set()
 
 
 if __name__ == "__main__":
