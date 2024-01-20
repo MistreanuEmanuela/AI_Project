@@ -239,7 +239,7 @@ def not_available(df):
 
 
 def preprocessing():
-    df = pd.read_csv('HHCAHPS_Provider_Jan2024.csv')
+    df = pd.read_csv('data.csv')
     df = not_available(df)
     df = column_elimination(df)
     df = eliminate_row_space(df)
@@ -249,7 +249,7 @@ def preprocessing():
     data_view(df)
     df = transform_str_to_numerical_rep(df)
     df = convert_to_float(df)
-    y = df['HHCAHPS Survey Summary Star Rating'].values.astype(float)
+    y = df['Quality of patient care star rating'].values.astype(float)
     df = correlation_elimination(df, y)
     csv_update(df)
 
