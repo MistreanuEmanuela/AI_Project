@@ -148,7 +148,6 @@ def train_neuronal_network_multi_class(x, y, alpha_values=[0.01, 0.1, 1.0]):
 
 
 def train_bayes(x, y):
-    x, y_encoded = preprocess_data(x, y)
     label_encoder = LabelEncoder()
     y = label_encoder.fit_transform(y)
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=42, stratify=y)
@@ -327,8 +326,8 @@ def main():
     print("predicting instance with RN - multiclass: ", predict_instance_RN_multiclass(label_encoder, RN_model2,
                                                                                        new_instance,
                                                                                        sc_rn2))
-    # print("predicting instance with Bayes: ", predict_instance_bayes(label_encoder, bayes_model,
-    #                                                                  [86.7, 92.3, 94.6, 100.0, 99.6]))
+    print("predicting instance with Bayes: ", predict_instance_bayes(label_encoder, bayes_model,
+                                                                     new_instance))
     print("predicting instance with Linear Regression: ", predict_instance_linear_regression(linear_regression_model,
                                                                             new_instance))
     print("predicting instance with Random Forest: ", predict_instance_random_forest(rf_model, new_instance
