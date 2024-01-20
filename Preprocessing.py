@@ -38,8 +38,7 @@ def find_type(data):
                 return "str"
 
 
-def csv_update(data):
-    csv_file_name = "preprocessing_data.csv"
+def csv_update(data, csv_file_name):
     with open(csv_file_name, mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
         header_row = list(data.columns)
@@ -251,7 +250,21 @@ def preprocessing():
     df = convert_to_float(df)
     y = df['Quality of patient care star rating'].values.astype(float)
     df = correlation_elimination(df, y)
-    csv_update(df)
+    csv_update(df, 'result1.csv')
+
+    df = pd.read_csv('HHCAHPS_Provider_Jan2024.csv')
+    df = not_available(df)
+    df = column_elimination(df)
+    df = eliminate_row_space(df)
+    df = eliminate_outliers(df)
+    df = nan_complete(df)
+    df = bool_complete(df)
+    data_view(df)
+    df = transform_str_to_numerical_rep(df)
+    df = convert_to_float(df)
+    y = df['HHCAHPS Survey Summary Star Rating'].values.astype(float)
+    df = correlation_elimination(df, y)
+    csv_update(df, "result2.csv")
 
 
 preprocessing()

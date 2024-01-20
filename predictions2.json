@@ -1,0 +1,23 @@
+{
+  "ID3": {
+    "Target": 2.0
+  },
+  "RN - continous": {
+    "Target": 3.672022581100464
+  },
+  "RN - multiclass": {
+    "Target": 3.0
+  },
+  "Bayes": {
+    "Target": 3.0
+  },
+  "Linear Regression": {
+    "Target": 2.7886469531772273
+  },
+  "Random Forest": {
+    "Target": 2.0
+  },
+  "AdaBoost": {
+    "Target": 2.9523809523809526
+  }
+}
