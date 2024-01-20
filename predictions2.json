@@ -1,9 +1,9 @@
 {
   "ID3": {
-    "Target": 2.0
+    "Target": 3.0
   },
   "RN - continous": {
-    "Target": 3.672022581100464
+    "Target": 3.6805219650268555
   },
   "RN - multiclass": {
     "Target": 3.0
@@ -15,7 +15,7 @@
     "Target": 2.7886469531772273
   },
   "Random Forest": {
-    "Target": 2.0
+    "Target": 3.0
   },
   "AdaBoost": {
     "Target": 2.9523809523809526
