@@ -7,7 +7,6 @@ import csv
 class CSVViewer:
     def __init__(self, root):
         self.root = root
-        self.root.title("CSV Viewer")
         self.frame1 = None
         self.frame2 = None
 
@@ -42,7 +41,7 @@ class CSVViewer:
 
     def setup_csv_section(self, path):
         self.frame1 = ttk.Frame(self.root)
-        self.frame1.place(x=20, y=150, width=700, height=300)
+        self.frame1.place(x=20, y=150, width=700, height=250)
         self.frame1.pack_propagate(False)
 
         tree = ttk.Treeview(self.frame1, show="headings")
@@ -53,13 +52,13 @@ class CSVViewer:
         vsb.pack(side='right', fill='y')
         hsb.pack(side='bottom', fill='x')
 
-        tree.place(x=0, y=0, width=700, height=300)
+        tree.place(x=0, y=0, width=700, height=250)
 
         self.display_csv_data(tree, path)
 
     def setup_csv_preprocessing_section(self, path):
         self.frame2 = ttk.Frame(self.root)
-        self.frame2.place(x=20, y=490, width=700, height=300)
+        self.frame2.place(x=20, y=430, width=700, height=250)
         self.frame2.pack_propagate(False)
 
         tree = ttk.Treeview(self.frame2, show="headings")
@@ -70,7 +69,7 @@ class CSVViewer:
         vsb.pack(side='right', fill='y')
         hsb.pack(side='bottom', fill='x')
 
-        tree.place(x=0, y=0, width=700, height=300)
+        tree.place(x=0, y=0, width=700, height=250)
 
         self.display_csv_data(tree, path)
 

@@ -14,7 +14,7 @@ class TitleScreen:
         self.setup_window()
 
     def setup_window(self):
-        self.window.geometry("1200x900")
+        self.window.geometry("1200x750")
         self.window.title("AI Project")
         self.window.resizable(False, False)
 
@@ -32,13 +32,13 @@ class TitleScreen:
         button_width = 20
         button_height = 3
 
-        button_font = ("Arial", 14)
+        button_font = ("Arial", 16)
 
         button = tk.Button(self.window, text="Începe",
                            command=lambda: self.on_button_click(),
                            width=button_width, height=button_height, borderwidth=2, highlightthickness=0,
                            font=button_font)
-        self.title_screen_canvas.create_window(800, 450, window=button, anchor='nw')
+        self.title_screen_canvas.create_window(800, 400, window=button, anchor='nw')
 
     def on_button_click(self):
         self.title_screen_canvas.destroy()

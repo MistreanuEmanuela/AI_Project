@@ -44,15 +44,15 @@ class ViewData:
                                 text="Selectează fișierul cu date:",
                                 font=("Arial", 16, "bold"), anchor='nw')
 
-        self.canvas.create_text(825, 115,
+        self.canvas.create_text(825, 20,
                                 text="Încearcă o predicție",
                                 font=("Arial", 16, "bold"), anchor='nw')
 
-        self.canvas.create_text(20, 800,
+        self.canvas.create_text(20, 680,
                                 text="Vizualizează grafice",
-                                font=("Arial", 16, "bold"), anchor='nw')
+                                font=("Arial", 12, "bold"), anchor='nw')
 
-        self.canvas.create_text(225, 804,
+        self.canvas.create_text(175, 681,
                                 text="(din primul csv)",
                                 font=("Arial", 10), anchor='nw')
 
@@ -60,59 +60,59 @@ class ViewData:
                                                        text="HH_Provider_Jan2024.csv",
                                                        font=("Arial", 12, "bold"), anchor='nw')
 
-        self.text_label_preproc = self.canvas.create_text(20, 460,
+        self.text_label_preproc = self.canvas.create_text(20, 400,
                                                           text="Preprocessing_HH.csv",
                                                           font=("Arial", 12, "bold"), anchor='nw')
 
-        self.text_label_col1 = self.canvas.create_text(760, 160,
+        self.text_label_col1 = self.canvas.create_text(760, 80,
                                                        text="- How often patients got better \n  at walking or moving around (%):",
                                                        font=("Arial", 13), anchor='nw')
         entry_x = 1050
-        entry_y = 165
+        entry_y = 85
         self.entry_var1 = tk.StringVar()
         entry_widget = tk.Entry(self.canvas, textvariable=self.entry_var1, width=6, font=("Arial", 13), validate="key",
                                 validatecommand=(self.canvas.register(self.validate_entry), "%P"))
         entry_widget.place(x=entry_x, y=entry_y)
 
-        self.text_label_col2 = self.canvas.create_text(760, 215,
+        self.text_label_col2 = self.canvas.create_text(760, 135,
                                                        text="- How often patients got better \n  at getting in and out of bed (%):",
                                                        font=("Arial", 13), anchor='nw')
 
         entry_x = 1050
-        entry_y = 220
+        entry_y = 140
         self.entry_var2 = tk.StringVar()
         entry_widget = tk.Entry(self.canvas, textvariable=self.entry_var2, width=6, font=("Arial", 13), validate="key",
                                 validatecommand=(self.canvas.register(self.validate_entry), "%P"))
         entry_widget.place(x=entry_x, y=entry_y)
 
-        self.text_label_col3 = self.canvas.create_text(760, 265,
+        self.text_label_col3 = self.canvas.create_text(760, 190,
                                                        text="- How often patients got better \n  at bathing (%):",
                                                        font=("Arial", 13), anchor='nw')
 
         entry_x = 1050
-        entry_y = 270
+        entry_y = 195
         self.entry_var3 = tk.StringVar()
         entry_widget = tk.Entry(self.canvas, textvariable=self.entry_var3, width=6, font=("Arial", 13), validate="key",
                                 validatecommand=(self.canvas.register(self.validate_entry), "%P"))
         entry_widget.place(x=entry_x, y=entry_y)
 
-        self.text_label_col4 = self.canvas.create_text(760, 320,
+        self.text_label_col4 = self.canvas.create_text(760, 245,
                                                        text="- How often patients' breathing \n  improved (%):",
                                                        font=("Arial", 13), anchor='nw')
 
         entry_x = 1050
-        entry_y = 325
+        entry_y = 250
         self.entry_var4 = tk.StringVar()
         entry_widget = tk.Entry(self.canvas, textvariable=self.entry_var4, width=6, font=("Arial", 13), validate="key",
                                 validatecommand=(self.canvas.register(self.validate_entry), "%P"))
         entry_widget.place(x=entry_x, y=entry_y)
 
-        self.text_label_col5 = self.canvas.create_text(760, 375,
+        self.text_label_col5 = self.canvas.create_text(760, 300,
                                                        text="- How often patients got better \n  at taking their drugs correctly by \n  mouth (%):",
                                                        font=("Arial", 13), anchor='nw')
 
         entry_x = 1050
-        entry_y = 380
+        entry_y = 305
         self.entry_var5 = tk.StringVar()
         self.entry_widget = tk.Entry(self.canvas, textvariable=self.entry_var5, width=6, font=("Arial", 13),
                                      validate="key",
@@ -142,27 +142,27 @@ class ViewData:
 
         button3 = tk.Button(self.window, text="Medii și mediane",
                             command=lambda: self.on_button_average_medians(),
-                            width=button_width, height=button_height, borderwidth=1, highlightthickness=0,
+                            width=button_width, height=1, borderwidth=1, highlightthickness=0,
                             font=button_font, bg="#D9D9D9")
-        self.canvas.create_window(20, 835, window=button3, anchor='nw')
+        self.canvas.create_window(20, 710, window=button3, anchor='nw')
 
         button4 = tk.Button(self.window, text="Nr. inst. per clase",
                             command=lambda: self.on_button_nr_inst_classes(),
-                            width=button_width, height=button_height, borderwidth=1, highlightthickness=0,
+                            width=button_width, height=1, borderwidth=1, highlightthickness=0,
                             font=button_font, bg="#D9D9D9")
-        self.canvas.create_window(200, 835, window=button4, anchor='nw')
+        self.canvas.create_window(200, 710, window=button4, anchor='nw')
 
         button5 = tk.Button(self.window, text="Statistici algoritmi\nde clasificare",
                             command=lambda: self.on_button_stats(),
                             width=18, height=3, borderwidth=1, highlightthickness=0,
                             font=button_font, bg="#D9D9D9")
-        self.canvas.create_window(535, 816, window=button5, anchor='nw')
+        self.canvas.create_window(535, 680, window=button5, anchor='nw')
 
         button6 = tk.Button(self.window, text="Start",
                             command=lambda: self.on_button_click(),
                             width=10, height=2, borderwidth=1, highlightthickness=0,
                             font=button_font, bg="#D9D9D9")
-        self.canvas.create_window(900, 440, window=button6, anchor='nw')
+        self.canvas.create_window(900, 380, window=button6, anchor='nw')
 
     def predictions_labels(self, id3_prediction, RN_continuous_prediction, RN_multiclass_prediction, bayes_prediction,
                            linear_regression_prediction, random_forest_prediction, ada_boost_prediction):
@@ -171,42 +171,42 @@ class ViewData:
             self.label_algs_text = tk.Label(self.canvas,
                                             text="Predicții pentru target-ul\n'Quality of patient care star rating':",
                                             font=("Arial", 13, "bold"))
-            self.canvas.create_window(800, 520, window=self.label_algs_text, anchor='nw')
+            self.canvas.create_window(800, 450, window=self.label_algs_text, anchor='nw')
         else:
             self.label_algs_text = tk.Label(self.canvas,
                                             text="Predicții pentru target-ul\n'HHCAHPS Survey Summary Star Rating':",
                                             font=("Arial", 13, "bold"))
-            self.canvas.create_window(770, 520, window=self.label_algs_text, anchor='nw')
+            self.canvas.create_window(770, 450, window=self.label_algs_text, anchor='nw')
 
         self.id3_label = tk.Label(self.canvas, text=f"- Algoritmul ID3: {id3_prediction}", font=("Arial", 13))
-        self.canvas.create_window(760, 580, window=self.id3_label, anchor='nw')
+        self.canvas.create_window(760, 510, window=self.id3_label, anchor='nw')
 
         self.rn_continuous_label = tk.Label(self.canvas,
                                             text=f"- Rețele Neuronale (valori continue): {RN_continuous_prediction}",
                                             font=("Arial", 13))
-        self.canvas.create_window(760, 605, window=self.rn_continuous_label, anchor='nw')
+        self.canvas.create_window(760, 535, window=self.rn_continuous_label, anchor='nw')
 
         self.rn_multiclass_label = tk.Label(self.canvas,
                                             text=f"- Rețele Neuronale (clase multiple): {RN_multiclass_prediction}",
                                             font=("Arial", 13))
-        self.canvas.create_window(760, 630, window=self.rn_multiclass_label, anchor='nw')
+        self.canvas.create_window(760, 560, window=self.rn_multiclass_label, anchor='nw')
 
         self.bayes_label = tk.Label(self.canvas, text=f"- Algoritmul Bayes Naiv: {bayes_prediction}",
                                     font=("Arial", 13))
-        self.canvas.create_window(760, 655, window=self.bayes_label, anchor='nw')
+        self.canvas.create_window(760, 585, window=self.bayes_label, anchor='nw')
 
         self.linear_regression_label = tk.Label(self.canvas,
                                                 text=f"- Regresia Liniară: {linear_regression_prediction}",
                                                 font=("Arial", 13))
-        self.canvas.create_window(760, 680, window=self.linear_regression_label, anchor='nw')
+        self.canvas.create_window(760, 610, window=self.linear_regression_label, anchor='nw')
 
         self.rf_label = tk.Label(self.canvas, text=f"- Random Forest: {random_forest_prediction}",
                                  font=("Arial", 13))
-        self.canvas.create_window(760, 705, window=self.rf_label, anchor='nw')
+        self.canvas.create_window(760, 635, window=self.rf_label, anchor='nw')
 
         self.ada_boost_label = tk.Label(self.canvas, text=f"- Algoritmul AdaBoost: {ada_boost_prediction}",
                                         font=("Arial", 13))
-        self.canvas.create_window(760, 730, window=self.ada_boost_label, anchor='nw')
+        self.canvas.create_window(760, 660, window=self.ada_boost_label, anchor='nw')
 
     def on_button_click(self):
 
@@ -280,7 +280,7 @@ class ViewData:
         self.entry_widget = tk.Entry(self.canvas, textvariable=self.entry_var5, width=6, font=("Arial", 13),
                                      validate="key",
                                      validatecommand=(self.canvas.register(self.validate_entry), "%P"))
-        self.entry_widget.place(x=1050, y=380)
+        self.entry_widget.place(x=1050, y=305)
 
     def on_button_data2(self):
         if self.id3_label is not None:
@@ -300,13 +300,13 @@ class ViewData:
         self.canvas.itemconfig(self.text_label_preproc, text="Preprocessing_HHCAHPS.csv")
         self.diagrams = "diagrams2"
         self.canvas.itemconfig(self.text_label_col1,
-                               text="- Star Rating for health team gave\n  care in a professional way:")
+                               text="- Star Rating for health team gave\n  care in a professional way (1-5):")
         self.canvas.itemconfig(self.text_label_col2,
-                               text="- Star Rating for health team \n  communicated well with them:")
+                               text="- Star Rating for health team \n  communicated well with them (1-5):")
         self.canvas.itemconfig(self.text_label_col3,
-                               text="- Star Rating team discussed\n  medicines, pain, and home safety:")
+                               text="- Star Rating team discussed medicines,\n  pain, and home safety (1-5):")
         self.canvas.itemconfig(self.text_label_col4,
-                               text="- Star Rating for how patients rated \n  overall care from agency:")
+                               text="- Star Rating for how patients rated \n  overall care from agency (1-5):")
         self.canvas.itemconfig(self.text_label_col5, text="")
         self.entry_widget.destroy()
 
@@ -319,9 +319,15 @@ class ViewData:
         images = [f"../{self.diagrams}/accuracy_comparison.png", f"../{self.diagrams}/roc_neural.png",
                   f"../{self.diagrams}/accuracy_test.png", f"../{self.diagrams}/mean_error.png"]
 
+        # Set the desired smaller size
+        new_size = (500, 350)  # Adjust the dimensions according to your preference
+
         for i, image_file in enumerate(images):
             file_path = os.path.join("images", image_file)
             image = Image.open(file_path)
+
+            # Resize the image
+            image = image.resize(new_size, Image.LANCZOS)
 
             max_width = max(max_width, image.width)
             max_height = max(max_height, image.height)
@@ -353,7 +359,7 @@ class ViewData:
         new_window.title("Medii și mediane")
 
         image = Image.open(file_path)
-        resized_image = image.resize((1200, 900), PIL.Image.Resampling.LANCZOS)
+        resized_image = image.resize((1000, 700), PIL.Image.Resampling.LANCZOS)
 
         photo = ImageTk.PhotoImage(resized_image)
 
