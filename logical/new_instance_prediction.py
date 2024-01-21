@@ -13,9 +13,9 @@ def predict_instance_id3(model, instance, val):
 
 
 def predict_instance_RN_continuous(model, instance, scaler):
-    instance = scaler.fit_transform(instance)
+    instance = scaler.transform(instance)
     predictions = model.predict([instance])
-    return predictions[0][0]
+    return min(5, max(1, predictions[0][0]))
 
 
 def predict_instance_RN_multiclass(label_encoder, model, instance, scaler):
