@@ -39,8 +39,8 @@ def find_type(data):
                 return "str"
 
 
-def csv_update(data):
-    csv_file_name = "./data/Preprocessing_HH.csv"
+def csv_update(data, file_path):
+    csv_file_name = file_path
     with open(csv_file_name, mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
         header_row = list(data.columns)
@@ -108,6 +108,11 @@ def eliminate_outliers(data):
     return data
 
 
+def nan_target_remove(data, target_column):
+    data = data[~data[target_column].isin([3.61, 3.71])].reset_index(drop=True)
+    return data
+
+
 def nan_complete(data):
     for column in data.columns:
         if find_type(data[column]) == "float":
@@ -124,14 +129,10 @@ def bool_complete(data):
     return data
 
 
-def elimina_linii_cu_valoare(data):
-    data = data[data['Quality of patient care star rating'] != 3.61].reset_index(drop=True)
-    return data
-
-
-def data_view(data):
+def data_view(data, file_path):
     medians = []
     means = []
+    data = data.drop("CMS Certification Number (CCN)", axis=1)
     for column in data.columns:
         if find_type(data[column]) == 'float' or find_type(data[column]) == 'bool':
             array = [float(str(i).replace(',', '')) for i in data[column]]
@@ -160,7 +161,7 @@ def data_view(data):
     plt.xticks(x + bar_width / 2, columns, rotation=45, ha='right', fontsize=8)
     plt.legend()
     plt.tight_layout()
-    plt.savefig("./diagrams/medii_mediane.png")
+    plt.savefig(file_path)
     plt.close()
 
 
@@ -245,12 +246,12 @@ def not_available(df):
     return df
 
 
-def preprocessing():
-    folder_path = "./diagrams"
+def preprocessing(file_path, folder_path, target_column,  folder_photo_save, folder_data_save):
+    folder_path = folder_path
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
 
-    file_path = "./data/HH_Provider_Jan2024.csv"
+    file_path = file_path
     df = pd.read_csv(file_path)
     df = not_available(df)
     df = column_elimination(df)
@@ -258,11 +259,10 @@ def preprocessing():
     df = eliminate_outliers(df)
     df = nan_complete(df)
     df = bool_complete(df)
-
-    data_view(df)
+    data_view(df, folder_photo_save)
     df = transform_str_to_numerical_rep(df)
     df = convert_to_float(df)
-    y = df['Quality of patient care star rating'].values.astype(float)
+    y = df[target_column].values.astype(float)
     df = correlation_elimination(df, y)
-    df = elimina_linii_cu_valoare(df)
-    csv_update(df)
+    df = nan_target_remove(df, target_column=target_column)
+    csv_update(df, folder_data_save)

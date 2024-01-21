@@ -15,7 +15,7 @@ def predict_instance_id3(model, instance, val):
 def predict_instance_RN_continuous(model, instance, scaler):
     instance = scaler.transform(instance)
     predictions = model.predict([instance])
-    return min(5, max(1, predictions[0][0]))
+    return min(5, max(1.5, predictions[0][0]))
 
 
 def predict_instance_RN_multiclass(label_encoder, model, instance, scaler):
@@ -36,7 +36,7 @@ def predict_instance_bayes(label_encoder, model, instance):
 def predict_instance_linear_regression(model, instance):
     prediction = model.predict(instance)
 
-    if prediction[0] < 0:
+    if prediction[0] < 1.5:
         return 1.5
     else:
         return prediction[0]

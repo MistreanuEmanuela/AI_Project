@@ -41,7 +41,7 @@ class CSVViewer:
 
     def setup_csv_section(self, path):
         self.frame1 = ttk.Frame(self.root)
-        self.frame1.place(x=20, y=150, width=700, height=250)
+        self.frame1.place(x=20, y=140, width=700, height=260)
         self.frame1.pack_propagate(False)
 
         tree = ttk.Treeview(self.frame1, show="headings")
@@ -58,7 +58,7 @@ class CSVViewer:
 
     def setup_csv_preprocessing_section(self, path):
         self.frame2 = ttk.Frame(self.root)
-        self.frame2.place(x=20, y=430, width=700, height=250)
+        self.frame2.place(x=20, y=420, width=700, height=260)
         self.frame2.pack_propagate(False)
 
         tree = ttk.Treeview(self.frame2, show="headings")

@@ -23,13 +23,13 @@ def custom_round(number, precision):
     return round(number / precision) * precision
 
 
-def data_view_per_class(data, target):
+def data_view_per_class(data, target, file_path):
     target_counts = data[target].value_counts()
     target_counts.plot(kind='bar', color='skyblue', edgecolor='black')
     plt.title('Number of Rows for Each Value in "target" Column')
     plt.xlabel('Target Values')
     plt.ylabel('Count')
-    plt.savefig("./diagrams/nr_inst_classes.png")
+    plt.savefig(file_path)
     plt.close()
 
 
@@ -46,20 +46,15 @@ def retain_random_n_per_category(data, column_name, n=50):
     return result_df
 
 
-def data_for_classification(filename, target_column):
-    len_category = []
+def data_for_classification(filename, target_column, file_path):
     data = pd.read_csv(filename)
-    data_view_per_class(data, target_column)
-    values = set(data[target_column])
-    for column_value in values:
-        category_df = data[data[target_column] == float(column_value)]
-        len_category.append(len(category_df[target_column]))
+    data_view_per_class(data, target_column, file_path)
     data = retain_random_n_per_category(data, target_column, n=200)
     return data
 
 
-def load_data(filename, target_column):
-    df = data_for_classification(filename, target_column)
+def load_data(filename, target_column, file_path):
+    df = data_for_classification(filename, target_column, file_path)
     output = df[target_column]
     attributes = df.drop(columns=[target_column])
     return attributes, output
@@ -96,7 +91,8 @@ def train_id3(x, y):
 
 def train_neuronal_network_continuous(x, y):
     x_inc, y_encoded, sc = preprocess_data_rn(x, y)
-    input_dim = 5
+    dim = len(x_inc[0])
+    input_dim = dim
     x_train, x_test, y_train, y_test = train_test_split(x_inc, y, test_size=0.25, random_state=42, stratify=y)
     model = Sequential()
     model.add(Dense(units=50, activation='relu', input_dim=input_dim))
@@ -109,7 +105,6 @@ def train_neuronal_network_continuous(x, y):
 
 
 def create_model(units=50, activation='relu', input_dim=4, alpha=0.01, num_classes=5):
-    print(input_dim, num_classes)
     model = Sequential()
     model.add(Dense(units=units, activation=activation, input_dim=input_dim, kernel_regularizer=l2(alpha)))
     model.add(Dense(units=num_classes, activation='softmax'))
@@ -119,7 +114,6 @@ def create_model(units=50, activation='relu', input_dim=4, alpha=0.01, num_class
 
 def train_neuronal_network_multi_class(x, y, alpha_values=[0.01, 0.1, 1.0]):
     x_inp, y_enc, sc = preprocess_data_rn(x, y)
-    print(x_inp)
     y = pd.get_dummies(y)
     num_classes = len(set(y))
     x_train, x_test, y_train, y_test = train_test_split(x_inp, y, test_size=0.25, random_state=42, stratify=y)
@@ -127,8 +121,8 @@ def train_neuronal_network_multi_class(x, y, alpha_values=[0.01, 0.1, 1.0]):
     best_accuracy = 0
     best_params = {}
 
-    for units in [50]:
-        for activation in ['relu']:
+    for units in [50, 100]:
+        for activation in ['relu', 'tanh']:
             for alpha in alpha_values:
                 model = create_model(units=units, activation=activation, input_dim=input_dimension, alpha=alpha,
                                      num_classes=num_classes)
@@ -139,7 +133,7 @@ def train_neuronal_network_multi_class(x, y, alpha_values=[0.01, 0.1, 1.0]):
                     best_accuracy = accuracy
                     best_params = {'units': units, 'activation': activation, 'input_dim': input_dimension,
                                    'alpha': alpha, 'num_classes': num_classes}
-
+    print(best_params)
     final_model = create_model(**best_params)
     checkpoint = ModelCheckpoint('best_model.h5', monitor='val_loss', save_best_only=True)
     history = final_model.fit(x_train, y_train, epochs=200, batch_size=100, validation_data=(x_test, y_test),
@@ -193,69 +187,27 @@ def ada_boost(x, y):
     return adaboost_regressor, accuracy
 
 
-def predict_instance_id3(model, instance, val):
-    new_instance_prediction = model.predict(instance)
-    return val[new_instance_prediction[0]]
-
-
-def predict_instance_RN_continuous(model, instance, scaler):
-    instance = scaler.fit_transform(instance)
-    predictions = model.predict([instance])
-    print(predictions)
-    return predictions[0][0]
-
-
-def predict_instance_RN_multiclass(label_encoder, model, instance, scaler):
-    new_instance = scaler.transform(instance)
-    predictions = model.predict(new_instance)
-    predicted_class_index = np.argmax(predictions)
-    predicted_class_label = label_encoder.inverse_transform([predicted_class_index])[0]
-
-    return predicted_class_label
-
-
-def predict_instance_bayes(label_encoder, model, instance):
-    prediction = model.predict(instance)
-    decoded_prediction = label_encoder.inverse_transform(prediction)[0]
-    return decoded_prediction
-
-
-def predict_instance_linear_regression(model, instance):
-    prediction = model.predict(instance)
-    return prediction[0]
-
-
-def predict_instance_random_forest(model, instance, val):
-    prediction = model.predict(instance)
-    return val[prediction[0]]
-
-
-def predict_instance_ada_boost(model, instance):
-    prediction = model.predict(instance)
-    return prediction[0]
-
-
-def plot_rn_mae(history):
+def plot_rn_mae(history, file_path):
     plt.plot(history.history['val_mae'], label='Test MAE')
     plt.title('Mean test error (MAE) for Neural Network with Continuous Output')
     plt.xlabel('Epoch')
     plt.ylabel('Mean Absolute Error')
     plt.legend()
-    plt.savefig("./diagrams/mean_error.png")
+    plt.savefig(file_path)
     plt.close()
 
 
-def plot_rn_accuracy_continuous(history):
+def plot_rn_accuracy_continuous(history, file_path):
     plt.plot(history.history['val_accuracy'], label='Test Accuracy')
     plt.title('Accuracy on test set for Neural Network with Multi-class Output')
     plt.xlabel('Epoch')
     plt.ylabel('Accuracy')
     plt.legend()
-    plt.savefig("./diagrams/accuracy_test.png")
+    plt.savefig(file_path)
     plt.close()
 
 
-def plot_rn_ROC(model, x_test, num_classes, y_test):
+def plot_rn_ROC(model, x_test, num_classes, y_test, file_path):
     y_prediction_proba = model.predict(x_test)
     fpr = dict()
     tpr = dict()
@@ -274,12 +226,12 @@ def plot_rn_ROC(model, x_test, num_classes, y_test):
     plt.ylabel('True Positive Rate')
     plt.title('Receiver Operating Characteristic - Neural Network with Multi-class Output')
     plt.legend(loc='lower right')
-    plt.savefig("./diagrams/roc_neural.png")
+    plt.savefig(file_path)
     plt.close()
 
 
 def plot_test_accuracies_comparison(accuracy_id3, accuracy_RN_1, accuracy_RN_2, accuracy_bayes,
-                                    accuracy_linear_regression, accuracy_adaboost_regression, accuracy_rf):
+                                    accuracy_linear_regression, accuracy_adaboost_regression, accuracy_rf, file_path):
     models = ['ID3', 'RN (Reg)', 'RN (Class)', 'NB (Gaus)',
               'NB (Multi)', 'Linear Reg', 'Rand Forest']
     accuracies = [accuracy_id3, accuracy_RN_1, accuracy_RN_2, accuracy_bayes,
@@ -289,17 +241,14 @@ def plot_test_accuracies_comparison(accuracy_id3, accuracy_RN_1, accuracy_RN_2, 
     plt.title('Test Accuracies Comparison')
     plt.ylabel('Accuracy')
     plt.xticks(rotation=0, ha='center', fontsize=8)
-    plt.savefig("./diagrams/accuracy_comparison.png")
+    plt.savefig(file_path)
     plt.close()
 
 
-def round_five(numar):
-    return round(numar / 0.5) * 0.5
-
-
-def predictions():
-    X, Y = load_data("./data/Preprocessing_HH.csv", 'Quality of patient care star rating')
-    print(X, Y)
+def predictions(file_path, target_column, accuracy_plot_save, roc_plot, rn_cont_plot, mae_plt,
+                folder_path_train, directory_path, data_view_columns):
+    X, Y = load_data(file_path, target_column, data_view_columns)
+    num_class = len(set(Y))
     label_encoder = LabelEncoder()
     label_encoder.fit_transform(Y)
 
@@ -321,18 +270,17 @@ def predictions():
     print("Accuracy Random Forest: ", accuracy_rf)
     print("Accuracy Ada Boost: ", accuracy_ada_boost)
 
-    plot_rn_mae(history_rn1)
-    plot_rn_accuracy_continuous(history_rn2)
-    plot_rn_ROC(RN_model2, X_test_RN2, 5, y_test_RN2)
+    plot_rn_mae(history_rn1, mae_plt)
+    plot_rn_accuracy_continuous(history_rn2, rn_cont_plot)
+    plot_rn_ROC(RN_model2, X_test_RN2, num_class, y_test_RN2, roc_plot)
     plot_test_accuracies_comparison(accuracy_id3, accuracy_RN_1, accuracy_RN_2, accuracy_bayes,
-                                    accuracy_linear_regression, accuracy_ada_boost, accuracy_rf)
+                                    accuracy_linear_regression, accuracy_ada_boost, accuracy_rf, accuracy_plot_save)
 
     # ---------------------SAVING------------------------
-    folder_path = "./trained_models"
+    folder_path = folder_path_train
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
-
-    save_directory = './trained_models'
+    save_directory = directory_path
 
     joblib.dump(label_encoder, os.path.join(save_directory, 'label_encoder.joblib'))
 
