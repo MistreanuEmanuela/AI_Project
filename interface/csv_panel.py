@@ -7,7 +7,6 @@ import csv
 class CSVViewer:
     def __init__(self, root):
         self.root = root
-        self.root.title("CSV Viewer")
         self.frame1 = None
         self.frame2 = None
 
