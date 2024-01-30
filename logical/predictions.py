@@ -231,11 +231,11 @@ def plot_rn_ROC(model, x_test, num_classes, y_test, file_path):
 
 
 def plot_test_accuracies_comparison(accuracy_id3, accuracy_RN_1, accuracy_RN_2, accuracy_bayes,
-                                    accuracy_linear_regression, accuracy_adaboost_regression, accuracy_rf, file_path):
-    models = ['ID3', 'RN (Reg)', 'RN (Class)', 'NB (Gaus)',
-              'NB (Multi)', 'Linear Reg', 'Rand Forest']
+                                    accuracy_linear_regression, accuracy_rf, accuracy_adaboost_regression, file_path):
+    models = ['ID3', 'RN (Reg)', 'RN (Class)',
+              'NB', 'Linear Reg', 'Rand Forest', 'Ada Boost']
     accuracies = [accuracy_id3, accuracy_RN_1, accuracy_RN_2, accuracy_bayes,
-                  accuracy_linear_regression, accuracy_adaboost_regression, accuracy_rf]
+                  accuracy_linear_regression, accuracy_rf, accuracy_adaboost_regression]
     plt.bar(models, accuracies, color=['pink', 'blue', 'orange', 'green', 'red', 'purple', 'cyan', 'magenta'])
     plt.ylim(0, 1.2)
     plt.title('Test Accuracies Comparison')
@@ -274,7 +274,7 @@ def predictions(file_path, target_column, accuracy_plot_save, roc_plot, rn_cont_
     plot_rn_accuracy_continuous(history_rn2, rn_cont_plot)
     plot_rn_ROC(RN_model2, X_test_RN2, num_class, y_test_RN2, roc_plot)
     plot_test_accuracies_comparison(accuracy_id3, accuracy_RN_1, accuracy_RN_2, accuracy_bayes,
-                                    accuracy_linear_regression, accuracy_ada_boost, accuracy_rf, accuracy_plot_save)
+                                    accuracy_linear_regression, accuracy_rf, accuracy_ada_boost, accuracy_plot_save)
 
     # ---------------------SAVING------------------------
     folder_path = folder_path_train
